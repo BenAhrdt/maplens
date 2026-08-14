@@ -9,6 +9,7 @@ EnvironmentFile=/etc/maplens.env
 Environment=APP_DIR=/opt/maplens
 Environment=DATA_DIR=/opt/maplens/data
 Environment=NPM_CONFIG_CACHE=/var/cache/maplens-npm
+Environment=npm_config_devdir=/var/cache/maplens-npm/node-gyp
 CacheDirectory=maplens-npm
 ExecStart=/usr/bin/node /opt/maplens/scripts/update.js
 PrivateTmp=true

@@ -29,8 +29,15 @@ async function download(url) {
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, { encoding: 'utf8', ...options });
   if (result.status === 0) return;
-  const details = String(result.stderr || result.stdout || '').trim().split('\n').slice(-12).join('\n');
+  const details = String(result.stderr || result.stdout || '').trim().split('\n').slice(-30).join('\n');
   throw Error(`${command} ${args.join(' ')} fehlgeschlagen${details ? `:\n${details}` : ''}`);
+}
+
+function dependencyFingerprint(lockFile) {
+  if (!fs.existsSync(lockFile)) return '';
+  const lock = JSON.parse(fs.readFileSync(lockFile, 'utf8'));
+  const packages = Object.entries(lock.packages || {}).filter(([name]) => name).sort(([a], [b]) => a.localeCompare(b));
+  return crypto.createHash('sha256').update(JSON.stringify(packages)).digest('hex');
 }
 
 async function main() {
@@ -68,6 +75,7 @@ async function main() {
   execFileSync('tar', ['-xzf', archivePath, '-C', source]);
   const nextPackage = JSON.parse(fs.readFileSync(path.join(source, 'package.json'), 'utf8'));
   if (nextPackage.name !== 'maplens' || nextPackage.version !== version) throw Error('Paketversion passt nicht zum Release');
+  const dependenciesChanged = dependencyFingerprint(path.join(source, 'package-lock.json')) !== dependencyFingerprint(path.join(appDir, 'package-lock.json'));
 
   status('backing_up', { target_version: version });
   const backupDir = path.join(appDir, 'backups');
@@ -76,12 +84,14 @@ async function main() {
   execFileSync('tar', ['-czf', backup, '-C', appDir, 'data']);
 
   status('installing', { target_version: version, backup });
-  run('npm', ['ci', '--omit=dev'], { cwd: source, env: process.env });
+  if (dependenciesChanged) run('npm', ['ci', '--omit=dev'], { cwd: source, env: process.env });
   for (const entry of ['package.json', 'package-lock.json', 'server.js', 'install.sh', 'dev.sh', 'README.md', 'src', 'public', 'scripts', 'deploy']) {
     fs.cpSync(path.join(source, entry), path.join(appDir, entry), { recursive: true, force: true });
   }
-  fs.rmSync(path.join(appDir, 'node_modules'), { recursive: true, force: true });
-  fs.cpSync(path.join(source, 'node_modules'), path.join(appDir, 'node_modules'), { recursive: true });
+  if (dependenciesChanged) {
+    fs.rmSync(path.join(appDir, 'node_modules'), { recursive: true, force: true });
+    fs.cpSync(path.join(source, 'node_modules'), path.join(appDir, 'node_modules'), { recursive: true });
+  }
   execFileSync('chown', ['-R', 'root:root', appDir]);
   execFileSync('chown', ['-R', 'maplens:maplens', dataDir]);
   fs.rmSync(requestFile, { force: true });
@@ -89,11 +99,15 @@ async function main() {
   execFileSync('systemctl', ['restart', 'maplens']);
 }
 
-main().catch(error => {
-  try {
-    fs.rmSync(requestFile, { force: true });
-    status('failed', { error: error.message });
-  } catch {}
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(error => {
+    try {
+      fs.rmSync(requestFile, { force: true });
+      status('failed', { error: error.message });
+    } catch {}
+    console.error(error);
+    process.exit(1);
+  });
+}
+
+module.exports = { dependencyFingerprint };
