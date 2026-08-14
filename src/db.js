@@ -33,6 +33,8 @@ function openDatabase(filename = process.env.DB_PATH || path.join(process.cwd(),
   if (!db.prepare("SELECT 1 FROM pragma_table_info('hotspots') WHERE name='location_name'").get()) db.exec("ALTER TABLE hotspots ADD COLUMN location_name TEXT NOT NULL DEFAULT ''");
   if (!db.prepare("SELECT 1 FROM pragma_table_info('users') WHERE name='role'").get()) db.exec("ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'viewer' CHECK(role IN ('admin','viewer')); UPDATE users SET role='admin' WHERE id=(SELECT MIN(id) FROM users)");
   if (!db.prepare("SELECT 1 FROM pragma_table_info('images') WHERE name='visibility'").get()) db.exec("ALTER TABLE images ADD COLUMN visibility TEXT NOT NULL DEFAULT 'public' CHECK(visibility IN ('public','restricted'))");
+  if (!db.prepare("SELECT 1 FROM pragma_table_info('images') WHERE name='sort_order'").get()) db.exec('ALTER TABLE images ADD COLUMN sort_order INTEGER');
+  db.exec('UPDATE images SET sort_order=id WHERE sort_order IS NULL; CREATE INDEX IF NOT EXISTS idx_images_sort_order ON images(sort_order,id)');
   if (!db.prepare("SELECT 1 FROM pragma_table_info('city_names') WHERE name='search_name'").get()) db.exec('ALTER TABLE city_names ADD COLUMN search_name TEXT');
   db.exec('CREATE INDEX IF NOT EXISTS idx_city_names_search ON city_names(search_name,city_id)');
   if (db.prepare('SELECT 1 FROM city_names WHERE search_name IS NULL LIMIT 1').get()) db.exec('UPDATE city_names SET search_name=normalize_place_name(name) WHERE search_name IS NULL');
