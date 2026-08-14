@@ -54,5 +54,5 @@ const zoomField=document.createElement('label');zoomField.innerHTML='Karten-Zoom
 function leaveAdmin(){if(!admin)return;admin=false;drawing=false;$('#admin').classList.remove('open');renderHotspots();if(selected?.latitude!=null)setMarker(selected.latitude,selected.longitude,false)}
 $('#closeAdmin').textContent='← Besucheransicht';$('#closeAdmin').title='Adminmodus verlassen (Esc)';$('#closeAdmin').onclick=leaveAdmin;
 window.addEventListener('keydown',e=>{if(e.key==='Escape'&&admin)leaveAdmin()});
-api('/api/auth/me').then(showSession).catch(()=>showSession(null));
+api('/api/status').then(status=>{$('.brand small').textContent=`Orte im Bild entdecken · v${status.version}`}).catch(()=>{});api('/api/auth/me').then(showSession).catch(()=>showSession(null));
 loadContinents();loadImages();
