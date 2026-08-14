@@ -83,7 +83,7 @@ Admins können im Editor über **Benutzer verwalten** weitere Konten als Betrach
 
 ## Geodaten
 
-Der Installer lädt automatisch alle Länder und über 230.000 Orte ab 500 Einwohnern (plus Verwaltungssitze und alternative/lokalisierte Namen). In einer Entwicklungsinstallation lässt sich dieser Import manuell ausführen:
+Der Installer lädt automatisch alle Länder und über 230.000 Orte ab 500 Einwohnern (plus Verwaltungssitze und alternative/lokalisierte Namen). MapLens erkennt außerdem beim Serverstart eine reine Demo-Datenbank und holt den Import im Hintergrund nach – auch wenn die Importfunktion erst über ein Browserupdate hinzugekommen ist. In einer Entwicklungsinstallation lässt sich dieser Import manuell ausführen:
 
 ```bash
 npm run setup:geodata
