@@ -1,6 +1,6 @@
 {
   "name": "maplens",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "private": true,
   "engines": {
     "node": ">=22"
