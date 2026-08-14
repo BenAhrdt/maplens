@@ -89,6 +89,8 @@ Administratoren werden über neue Versionen informiert. Eine Installation erfolg
 
 Alternativ kann im Adminbereich **Nach Updates suchen** ausgewählt werden. Vor jedem Update erstellt MapLens automatisch ein Backup, installiert die neue Version und lädt die Browserseite nach dem Neustart selbstständig neu.
 
+Vor der Installation zeigt der Update-Dialog die Änderungen der neuen Version an. Ein Klick auf die Versionsnummer im MapLens-Kopfbereich öffnet jederzeit den Versionsverlauf der letzten Releases.
+
 Fotos, Benutzer, Hotspots und Einstellungen bleiben bei einem Update erhalten.
 
 ## Verwaltung und Fehlerdiagnose
