@@ -31,7 +31,7 @@ Voraussetzung ist ein frischer Debian- oder Ubuntu-Container mit Root-Zugriff. D
 curl -fsSL https://raw.githubusercontent.com/BenAhrdt/maplens/main/scripts/install-remote.sh | sudo bash
 ```
 
-Danach ist MapLens unter `http://<SERVER-IP>/` erreichbar. Beim ersten Öffnen über **Admin** wird der erste Administrator angelegt. Der Installer richtet Node.js, nginx, den Anwendungsdienst und den abgesicherten Update-Dienst mit Autostart ein.
+Danach ist MapLens unter `http://<SERVER-IP>/` erreichbar. Beim ersten Öffnen über **Admin** wird der erste Administrator angelegt. Der Installer richtet Node.js, nginx, den Anwendungsdienst und den abgesicherten Update-Dienst mit Autostart ein. Bei einer neuen Installation werden außerdem automatisch die vollständigen GeoNames-Ortsdaten samt alternativen und lokalisierten Namen importiert.
 
 Alternativ kann aus einem geklonten Repository installiert werden:
 
@@ -83,7 +83,7 @@ Admins können im Editor über **Benutzer verwalten** weitere Konten als Betrach
 
 ## Geodaten
 
-Die sofort nutzbare Seed-Datenbank enthält nur einige Demo-Orte. Für alle Länder und über 230.000 Orte ab 500 Einwohnern (plus Verwaltungssitze und alternative/lokalisierte Namen) genügt:
+Der Installer lädt automatisch alle Länder und über 230.000 Orte ab 500 Einwohnern (plus Verwaltungssitze und alternative/lokalisierte Namen). In einer Entwicklungsinstallation lässt sich dieser Import manuell ausführen:
 
 ```bash
 npm run setup:geodata
