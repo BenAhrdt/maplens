@@ -14,7 +14,7 @@ Die SQLite-Datei liegt standardmäßig in `data/maplens.sqlite`, Uploads in `dat
 
 ## Entwicklung
 
-Voraussetzung ist Node.js 20 oder neuer.
+Voraussetzung ist Node.js 22 oder neuer.
 
 ```bash
 npm install

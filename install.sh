@@ -4,7 +4,18 @@ if [[ $EUID -ne 0 ]]; then echo "Bitte als root ausführen: sudo ./install.sh"; 
 APP_DIR=/opt/maplens
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 apt-get update
-apt-get install -y nodejs npm nginx build-essential python3 openssl curl ca-certificates
+apt-get install -y nginx build-essential python3 openssl curl ca-certificates
+node_major="$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || true)"
+if [[ ! "$node_major" =~ ^[0-9]+$ ]] || (( node_major < 22 )); then
+  echo "Installiere Node.js 22 …"
+  node_setup="$(mktemp)"
+  curl -fsSL https://deb.nodesource.com/setup_22.x -o "$node_setup"
+  bash "$node_setup"
+  rm -f "$node_setup"
+  apt-get install -y nodejs
+elif ! command -v npm >/dev/null 2>&1; then
+  apt-get install -y npm
+fi
 id maplens >/dev/null 2>&1 || useradd --system --home "$APP_DIR" --shell /usr/sbin/nologin maplens
 mkdir -p "$APP_DIR" "$APP_DIR/data/images"
 cp -a "$SOURCE_DIR/package.json" "$SOURCE_DIR/package-lock.json" "$SOURCE_DIR/server.js" "$SOURCE_DIR/src" "$SOURCE_DIR/public" "$SOURCE_DIR/scripts" "$SOURCE_DIR/deploy" "$APP_DIR/"
