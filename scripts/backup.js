@@ -1,0 +1,1 @@
+const fs=require('fs'),path=require('path'),{execFileSync}=require('child_process');const root=process.cwd(),data=path.join(root,'data'),out=path.join(root,`maplens-backup-${new Date().toISOString().replace(/[:.]/g,'-')}.tar.gz`);if(!fs.existsSync(data))throw Error('Noch keine Daten vorhanden.');execFileSync('tar',['-czf',out,'-C',root,'data']);console.log(out);

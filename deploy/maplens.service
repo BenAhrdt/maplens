@@ -1,0 +1,16 @@
+[Unit]
+Description=MapLens photo map
+After=network.target
+[Service]
+Type=simple
+User=maplens
+Group=maplens
+WorkingDirectory=/opt/maplens
+EnvironmentFile=/etc/maplens.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/maplens/data
+[Install]
+WantedBy=multi-user.target

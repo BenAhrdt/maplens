@@ -1,0 +1,14 @@
+[Unit]
+Description=Install a verified MapLens release
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/maplens.env
+Environment=APP_DIR=/opt/maplens
+Environment=DATA_DIR=/opt/maplens/data
+ExecStart=/usr/bin/node /opt/maplens/scripts/update.js
+PrivateTmp=true
+ProtectHome=true
+NoNewPrivileges=true
