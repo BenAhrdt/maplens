@@ -1,144 +1,142 @@
 # MapLens
 
-MapLens verbindet Details eines Fotos mit Orten auf einer interaktiven Weltkarte. Besucher zoomen durch Bilder, wählen SVG-Hotspots und sehen den zugehörigen Ort, Informationen und Links. Im geschützten Adminmodus lassen sich Fotos und Hotspots direkt bearbeiten.
+MapLens verbindet markierte Bereiche in Fotos mit Orten auf einer interaktiven Weltkarte. Zu jedem Hotspot können Texte, eine Kartenposition und weiterführende Links hinterlegt werden.
 
-## Architektur
+Die Anwendung eignet sich beispielsweise für Reisebilder, Sammlungen, Erinnerungsfotos oder Bilder mit vielen geografischen Bezügen.
 
-- **Node.js + Express**: kompakte REST-API und Auslieferung des statischen Frontends
-- **SQLite (better-sqlite3)**: lokale, transaktionale Speicherung ohne externen Dienst
-- **Leaflet**: lokale Kartenbibliothek; Kacheladresse und Attribution liegen in `settings`
-- **SVG**: Hotspots teilen das Koordinatensystem des Originalbildes. `x`, `y` und `radius` werden normalisiert gespeichert.
-- **Vanilla JavaScript/CSS**: kein Frontend-Buildschritt, geringe Betriebs- und Updatekomplexität
+## Funktionen
 
-Die SQLite-Datei liegt standardmäßig in `data/maplens.sqlite`, Uploads in `data/images/`. Passwörter werden mit bcrypt gehasht, Sessions in HttpOnly/SameSite-Cookies gespeichert. Uploads werden nach MIME-Typ, tatsächlichem Bildformat und Größe geprüft und unter UUID-Namen abgelegt.
+- Fotos mit frei platzierbaren Hotspots verknüpfen
+- Orte direkt auf der Weltkarte anzeigen
+- Suche nach lokalen, deutschen und englischen Ortsnamen
+- tolerante Suche bei Akzenten, Apostrophen, Leerzeichen und Bindestrichen
+- deutsche und englische Benutzeroberfläche
+- Fotos austauschen, ohne vorhandene Hotspots und Freigaben zu verlieren
+- öffentliche oder benutzerspezifische Foto-Freigaben
+- eigene Farben, Beschreibungen und Links pro Hotspot
+- automatische, bestätigungspflichtige Updates mit vorherigem Backup
+- responsive Darstellung auf Desktop und Mobilgeräten
 
-## Entwicklung
+## Installation auf Debian oder Ubuntu
 
-Voraussetzung ist Node.js 22 oder neuer.
-
-```bash
-npm install
-./dev.sh
-```
-
-Dann `http://localhost:8000` öffnen. Beim ersten Klick auf **Admin** wird lokal der erste Administrator angelegt (Passwort mindestens zehn Zeichen). Für einen dauerhaften Entwicklungs-Schlüssel `SESSION_SECRET` setzen.
-
-## Einfache Installation in Debian/Ubuntu-LXC
-
-Voraussetzung ist ein frischer Debian- oder Ubuntu-Container mit Root-Zugriff. Die aktuelle stabile Version wird mit einem Befehl heruntergeladen, per SHA-256 geprüft und als systemd-Dienst installiert:
+Benötigt wird ein Debian- oder Ubuntu-System beziehungsweise LXC mit Root-Zugriff.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/BenAhrdt/maplens/main/scripts/install-remote.sh | sudo bash
 ```
 
-Danach ist MapLens unter `http://<SERVER-IP>/` erreichbar. Beim ersten Öffnen über **Admin** wird der erste Administrator angelegt. Der Installer richtet Node.js, nginx, den Anwendungsdienst und den abgesicherten Update-Dienst mit Autostart ein. Bei einer neuen Installation werden außerdem automatisch die vollständigen GeoNames-Ortsdaten samt alternativen und lokalisierten Namen importiert.
+Der Installer richtet MapLens, Node.js, nginx und die benötigten systemd-Dienste automatisch ein. Außerdem werden die vollständigen GeoNames-Ortsdaten importiert. Dieser Import kann beim ersten Start einige Minuten dauern.
 
-Alternativ kann aus einem geklonten Repository installiert werden:
+Anschließend ist MapLens im Browser erreichbar:
 
-```bash
-git clone https://github.com/BenAhrdt/maplens.git
-cd maplens
-sudo ./install.sh
+```text
+http://SERVER-IP/
 ```
 
-Verwaltung:
+Beim ersten Klick auf **Anmelden** wird der erste Administrator angelegt. Das Passwort muss mindestens zehn Zeichen lang sein.
+
+Für eine öffentlich erreichbare Installation sollte anschließend HTTPS eingerichtet werden.
+
+## Erste Schritte
+
+1. Als Administrator anmelden.
+2. Den Adminbereich öffnen.
+3. Ein Foto und einen Bildtitel auswählen und hochladen.
+4. Unter **Hotspot** auf **Zeichnen** klicken.
+5. Im Foto auf die gewünschte Position klicken.
+6. Titel, Beschreibung und Ort eintragen.
+7. Optional Farbe, Kartenposition und weiterführende Links anpassen.
+8. Den Hotspot speichern.
+
+Hotspots lassen sich im Foto verschieben. Ihre Größe wird über den Radiusregler beziehungsweise den weißen Griff angepasst. Der Kartenmarker kann für eine genaue Position ebenfalls verschoben werden.
+
+## Ortssuche
+
+Die Suche berücksichtigt Originalnamen sowie deutsche und englische Alternativnamen. Beispielsweise führen sowohl `Köln` als auch `Cologne` zum passenden Ort.
+
+Unterschiede durch Akzente, Apostrophe, Leerzeichen oder Bindestriche werden ignoriert. Dadurch funktionieren unter anderem `Paleochora`, `Palaiochora` und die originale Schreibweise `Palaióchora`.
+
+Über **Ortsname für Anzeige** kann zusätzlich ein eigener Name wie „Zuhause“ oder „Sommerurlaub“ eingetragen werden.
+
+## Vorhandenes Foto ersetzen
+
+Soll eine überarbeitete Version eines Fotos verwendet werden, muss das Bild nicht neu angelegt werden.
+
+1. Das betreffende Foto öffnen.
+2. Im Adminbereich **Aktuelles Foto ersetzen** auswählen.
+3. Die neue Bilddatei auswählen und den Austausch bestätigen.
+
+Hotspots, Texte, Links, Kartenpositionen und Benutzerfreigaben bleiben erhalten. Bei einem deutlich anderen Seitenverhältnis weist MapLens darauf hin, dass die Positionen der Hotspots möglicherweise nachjustiert werden müssen.
+
+## Benutzer und Sichtbarkeit
+
+Unter **Benutzer verwalten** können weitere Administratoren oder Betrachter angelegt werden.
+
+Über **Sichtbarkeit des aktuellen Fotos** kann ein Foto entweder:
+
+- öffentlich und ohne Anmeldung sichtbar sein oder
+- nur für ausgewählte Benutzer freigegeben werden.
+
+Diese Einschränkung gilt auch für die Bilddatei, ihre Hotspots und die Punkte in der Weltansicht.
+
+## Sprache ändern
+
+Oben im Kopfbereich kann zwischen **DE** und **EN** gewechselt werden. Die Auswahl wird im Browser gespeichert. Beim ersten Besuch verwendet MapLens nach Möglichkeit die Sprache des Browsers.
+
+## Updates
+
+Administratoren werden über neue Versionen informiert. Eine Installation erfolgt niemals ohne Bestätigung.
+
+Alternativ kann im Adminbereich **Nach Updates suchen** ausgewählt werden. Vor jedem Update erstellt MapLens automatisch ein Backup, installiert die neue Version und lädt die Browserseite nach dem Neustart selbstständig neu.
+
+Fotos, Benutzer, Hotspots und Einstellungen bleiben bei einem Update erhalten.
+
+## Verwaltung und Fehlerdiagnose
+
+Status prüfen:
 
 ```bash
 systemctl status maplens
+```
+
+MapLens neu starten:
+
+```bash
 systemctl restart maplens
+```
+
+Protokoll live anzeigen:
+
+```bash
 journalctl -u maplens -f
 ```
 
-Anwendung und Daten liegen getrennt unter `/opt/maplens`; Geheimnisse stehen mit restriktiven Rechten in `/etc/maplens.env`. Für öffentlich erreichbare Installationen sollte zusätzlich TLS eingerichtet werden.
-
-## Automatische Updates
-
-Nach der Anmeldung eines Administrators prüft MapLens beim Laden der Oberfläche, ob auf GitHub ein neueres Release verfügbar ist. Besucher und Betrachter sehen keine Updatefunktionen. Ein verfügbares Update wird nur angeboten und niemals ohne Bestätigung installiert.
-
-Nach der Bestätigung läuft folgender Ablauf:
-
-1. Der privilegienlose Webserver schreibt ausschließlich eine Updateanforderung.
-2. Der separate systemd-Dienst `maplens-update.service` lädt das aktuelle Release direkt aus diesem Repository.
-3. Die SHA-256-Prüfsumme und die Paketversion werden kontrolliert.
-4. Unter `/opt/maplens/backups/` wird ein vollständiges Backup des Datenordners angelegt.
-5. Programmdateien und Produktionsabhängigkeiten werden aktualisiert; Bilder und Datenbank bleiben erhalten.
-6. MapLens startet neu und der Browser lädt die Anwendung automatisch erneut.
-
-Eine manuelle Prüfung ist im Adminbereich über **Nach Updates suchen** möglich. Diagnose:
+Fehler des Update-Dienstes anzeigen:
 
 ```bash
-systemctl status maplens-update.service
 journalctl -u maplens-update.service -n 100
 ```
 
-Ein fehlgeschlagenes Update lässt die vorhandenen Daten unangetastet und zeigt dem Administrator den Fehler an. Das automatisch erzeugte Backup kann wie im Abschnitt „Backup“ beschrieben wiederhergestellt werden.
+Die Anwendung liegt unter `/opt/maplens`. Datenbank und Bilder befinden sich in `/opt/maplens/data`. Automatische Update-Backups werden unter `/opt/maplens/backups` abgelegt.
 
-## Bedienung
-
-Im Adminmodus Foto hochladen, **Zeichnen** wählen und in das Foto klicken. Den Kreis per Drag verschieben und über den weißen Griff bzw. Radiusregler skalieren. Kontinent, Land und Stadt wählen oder die Suche verwenden; der Kartenmarker lässt sich zur Feinpositionierung ziehen. Anschließend Texte und beliebig viele HTTP(S)-Links speichern. Ohne Adminmodus sind keine Bearbeitungsfunktionen sichtbar.
-
-### Benutzer und Bildfreigaben
-
-Admins können im Editor über **Benutzer verwalten** weitere Konten als Betrachter oder Admin anlegen, Rollen ändern und Passwörter zurücksetzen. Über **Sichtbarkeit des aktuellen Fotos** ist jedes Bild entweder öffentlich oder ausschließlich ausgewählten Betrachtern zugänglich. Die Zugriffskontrolle erfolgt serverseitig für Metadaten, Bilddatei und Hotspots. Der letzte Admin kann nicht gelöscht oder zum Betrachter herabgestuft werden.
-
-## Geodaten
-
-Der Installer lädt automatisch alle Länder und über 230.000 Orte ab 500 Einwohnern (plus Verwaltungssitze und alternative/lokalisierte Namen). Die Ortssuche berücksichtigt Originalnamen sowie deutsche und englische Alternativnamen. Akzente, Apostrophe, Leerzeichen und Bindestriche sind für die Suche unerheblich. MapLens erkennt außerdem beim Serverstart eine reine Demo-Datenbank und holt den Import im Hintergrund nach – auch wenn die Importfunktion erst über ein Browserupdate hinzugekommen ist. In einer Entwicklungsinstallation lässt sich dieser Import manuell ausführen:
+## Manuelles Backup
 
 ```bash
-npm run setup:geodata
-```
-
-GeoNames-Daten stehen unter **Creative Commons Attribution 4.0**; die Namensnennung muss erhalten bleiben. Quelle und Lizenz: https://www.geonames.org/export/ und https://creativecommons.org/licenses/by/4.0/. Der Import arbeitet zeilenweise und legt indizierte Städte ab, sodass auch mehrere zehntausend Datensätze nicht als DOM-Liste geladen werden.
-
-Standardmäßig werden OpenStreetMap-Standardkacheln verwendet. Für relevante Last ist ein eigener oder geeigneter Tile-Provider in `settings` zu konfigurieren. Es gelten die [OSM Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) und die ODbL-Attribution.
-
-## REST-API
-
-Wichtige Routen: `GET/POST /api/images`, `GET /api/images/:id`, `POST /api/images/:id/hotspots`, `PUT/DELETE /api/hotspots/:id`, `/api/continents`, `/api/countries`, `/api/cities`, `/api/cities/search`, `/api/albums` und `/api/auth/*`. Schreibzugriffe sind authentifiziert. Die API liefert konsistente JSON-Fehler; eine OpenAPI-Oberfläche ist in V1 nicht enthalten.
-
-## Backup
-
-Bei laufender Anwendung:
-
-```bash
+cd /opt/maplens
 npm run backup
 ```
 
-Das erzeugt ein datiertes `maplens-backup-….tar.gz` mit Datenbank und Bildern. Restore: Dienst stoppen, vorhandenes `data/` sichern, Archiv im Projektverzeichnis entpacken, Eigentümer prüfen und Dienst starten.
+Das erzeugte Archiv enthält die Datenbank und sämtliche Bilder. Es sollte anschließend auf ein anderes System oder einen unabhängigen Datenträger kopiert werden.
 
-## Tests
-
-```bash
-npm test
-```
-
-Abgedeckt sind normalisierte Koordinaten/Skalierungsgrundlage, URL-Validierung, Authentifizierung, Hotspot-CRUD samt Beziehungen, geografische Suche, Bildfreigaben und geschützte Weltkartenpunkte.
-
-## Projektstruktur
-
-```text
-server.js              API und Webserver
-src/db.js              Schema/Migrationen und Demo-Geodaten
-src/validation.js      Eingabevalidierung
-public/                responsive Weboberfläche
-scripts/               GeoNames-Import und Backup
-deploy/                nginx und systemd
-data/                   lokale Laufzeitdaten (nach dem Start)
-test/                   automatisierte Tests
-```
-
-## Releases erstellen
-
-Die Version in `package.json` erhöhen, Änderungen committen und einen passenden SemVer-Tag pushen:
+Für eine Wiederherstellung MapLens zuerst stoppen, den vorhandenen Ordner `/opt/maplens/data` sichern und den `data`-Ordner aus dem Backup wieder unter `/opt/maplens` ablegen. Danach Eigentümer und Dienst wiederherstellen:
 
 ```bash
-npm version patch
-git push origin main --follow-tags
+chown -R maplens:maplens /opt/maplens/data
+systemctl start maplens
 ```
 
-Der GitHub-Workflow testet das Projekt und veröffentlicht automatisch `maplens.tar.gz` sowie `maplens.tar.gz.sha256`. Nur solche verifizierbaren Releasepakete akzeptiert der integrierte Updater.
+## Datenquellen und Lizenz
 
-## Lizenz
+MapLens steht unter der MIT-Lizenz.
 
-MapLens steht unter der MIT-Lizenz. GeoNames- und OpenStreetMap-Daten bzw. Kartenkacheln unterliegen ihren jeweils eigenen, oben verlinkten Lizenzen und Nutzungsbedingungen.
+Ortsdaten stammen von [GeoNames](https://www.geonames.org/) und stehen unter [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). Die Kartendarstellung verwendet standardmäßig Daten und Kacheln von [OpenStreetMap](https://www.openstreetmap.org/).
