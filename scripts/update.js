@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
-const { execFileSync } = require('child_process');
+const { execFileSync, spawnSync } = require('child_process');
 
 const appDir = process.env.APP_DIR || '/opt/maplens';
 const dataDir = process.env.DATA_DIR || path.join(appDir, 'data');
@@ -24,6 +24,13 @@ async function download(url) {
   const response = await fetch(url, { headers: { Accept: 'application/octet-stream', 'User-Agent': 'MapLens-Updater' } });
   if (!response.ok) throw Error(`Download fehlgeschlagen (${response.status})`);
   return Buffer.from(await response.arrayBuffer());
+}
+
+function run(command, args, options = {}) {
+  const result = spawnSync(command, args, { encoding: 'utf8', ...options });
+  if (result.status === 0) return;
+  const details = String(result.stderr || result.stdout || '').trim().split('\n').slice(-12).join('\n');
+  throw Error(`${command} ${args.join(' ')} fehlgeschlagen${details ? `:\n${details}` : ''}`);
 }
 
 async function main() {
@@ -69,7 +76,7 @@ async function main() {
   execFileSync('tar', ['-czf', backup, '-C', appDir, 'data']);
 
   status('installing', { target_version: version, backup });
-  execFileSync('npm', ['ci', '--omit=dev'], { cwd: source, stdio: 'inherit' });
+  run('npm', ['ci', '--omit=dev'], { cwd: source, env: process.env });
   for (const entry of ['package.json', 'package-lock.json', 'server.js', 'install.sh', 'dev.sh', 'README.md', 'src', 'public', 'scripts', 'deploy']) {
     fs.cpSync(path.join(source, entry), path.join(appDir, entry), { recursive: true, force: true });
   }
