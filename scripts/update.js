@@ -85,7 +85,7 @@ async function main() {
 
   status('installing', { target_version: version, backup });
   if (dependenciesChanged) run('npm', ['ci', '--omit=dev'], { cwd: source, env: process.env });
-  for (const entry of ['package.json', 'package-lock.json', 'server.js', 'install.sh', 'dev.sh', 'README.md', 'src', 'public', 'scripts', 'deploy']) {
+  for (const entry of ['package.json', 'package-lock.json', 'server.js', 'install.sh', 'dev.sh', 'README.md', 'CHANGELOG.json', 'src', 'public', 'scripts', 'deploy']) {
     fs.cpSync(path.join(source, entry), path.join(appDir, entry), { recursive: true, force: true });
   }
   if (dependenciesChanged) {

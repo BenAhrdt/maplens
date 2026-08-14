@@ -18,7 +18,7 @@ elif ! command -v npm >/dev/null 2>&1; then
 fi
 id maplens >/dev/null 2>&1 || useradd --system --home "$APP_DIR" --shell /usr/sbin/nologin maplens
 mkdir -p "$APP_DIR" "$APP_DIR/data/images"
-cp -a "$SOURCE_DIR/package.json" "$SOURCE_DIR/package-lock.json" "$SOURCE_DIR/server.js" "$SOURCE_DIR/src" "$SOURCE_DIR/public" "$SOURCE_DIR/scripts" "$SOURCE_DIR/deploy" "$APP_DIR/"
+cp -a "$SOURCE_DIR/package.json" "$SOURCE_DIR/package-lock.json" "$SOURCE_DIR/server.js" "$SOURCE_DIR/CHANGELOG.json" "$SOURCE_DIR/src" "$SOURCE_DIR/public" "$SOURCE_DIR/scripts" "$SOURCE_DIR/deploy" "$APP_DIR/"
 cd "$APP_DIR"
 npm ci --omit=dev
 chown -R root:root "$APP_DIR"
