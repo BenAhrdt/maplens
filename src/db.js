@@ -27,7 +27,10 @@ function openDatabase(filename = process.env.DB_PATH || path.join(process.cwd(),
     CREATE TABLE IF NOT EXISTS hotspots (id INTEGER PRIMARY KEY, image_id INTEGER NOT NULL REFERENCES images(id) ON DELETE CASCADE, x REAL NOT NULL CHECK(x BETWEEN 0 AND 1), y REAL NOT NULL CHECK(y BETWEEN 0 AND 1), radius REAL NOT NULL CHECK(radius > 0 AND radius <= 1), title TEXT NOT NULL, short_description TEXT NOT NULL DEFAULT '', description TEXT NOT NULL DEFAULT '', continent_code TEXT REFERENCES continents(code), country_code TEXT REFERENCES countries(code), city_id INTEGER REFERENCES cities(id), latitude REAL CHECK(latitude BETWEEN -90 AND 90), longitude REAL CHECK(longitude BETWEEN -180 AND 180), color TEXT NOT NULL DEFAULT '#42d3ff', label TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS hotspot_links (id INTEGER PRIMARY KEY, hotspot_id INTEGER NOT NULL REFERENCES hotspots(id) ON DELETE CASCADE, title TEXT NOT NULL, url TEXT NOT NULL, description TEXT NOT NULL DEFAULT '');
     CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
-    INSERT OR IGNORE INTO settings(key,value) VALUES ('tile_url','https://tile.openstreetmap.org/{z}/{x}/{y}.png'), ('tile_attribution','&copy; OpenStreetMap contributors');
+    INSERT OR IGNORE INTO settings(key,value) VALUES
+      ('tile_url','https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+      ('tile_attribution','&copy; OpenStreetMap contributors'),
+      ('map_style_url','https://tiles.openfreemap.org/styles/liberty');
   `);
   if (!db.prepare("SELECT 1 FROM pragma_table_info('hotspots') WHERE name='map_zoom'").get()) db.exec('ALTER TABLE hotspots ADD COLUMN map_zoom INTEGER NOT NULL DEFAULT 12 CHECK(map_zoom BETWEEN 2 AND 19)');
   if (!db.prepare("SELECT 1 FROM pragma_table_info('hotspots') WHERE name='location_name'").get()) db.exec("ALTER TABLE hotspots ADD COLUMN location_name TEXT NOT NULL DEFAULT ''");

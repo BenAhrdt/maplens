@@ -141,4 +141,4 @@ systemctl start maplens
 
 MapLens steht unter der MIT-Lizenz.
 
-Ortsdaten stammen von [GeoNames](https://www.geonames.org/) und stehen unter [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). Die Kartendarstellung verwendet standardmäßig Daten und Kacheln von [OpenStreetMap](https://www.openstreetmap.org/).
+Ortsdaten stammen von [GeoNames](https://www.geonames.org/) und stehen unter [Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/). Die Kartendarstellung verwendet standardmäßig die auf OpenStreetMap-Daten basierende [OpenFreeMap](https://openfreemap.org/)-Karte mit MapLibre. Die jeweilige Karten- und Datenattribution wird direkt in der Karte angezeigt.
