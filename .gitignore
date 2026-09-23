@@ -3,3 +3,5 @@ data/
 maplens-backup-*.tar.gz
 .env
 *.log
+/AGENTS.md
+/secondBrain/
